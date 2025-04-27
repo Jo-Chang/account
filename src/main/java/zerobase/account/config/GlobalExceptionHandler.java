@@ -15,21 +15,17 @@ import zerobase.account.type.ErrorStatus;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccountException.class)
-    public ResponseEntity handleAccountException(AccountException e) {
-        log.error("{} Exception is occurred.", e);
+    public ErrorResponse handleAccountException(AccountException e) {
+        log.error("{} - AccountException is occurred.", e, e.getErrorStatus());
 
-        return ResponseEntity
-                .badRequest()
-                .body(new ErrorResponse(e.getErrorStatus()));
+        return new ErrorResponse(e.getErrorStatus());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity handleException(Exception e) {
+    public ErrorResponse handleException(Exception e) {
         log.error("error occurred", e);
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(e);
+        return new ErrorResponse(ErrorStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

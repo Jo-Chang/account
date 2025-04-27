@@ -71,11 +71,13 @@ class AccountServiceTest {
         verify(accountRepository, times(1)).save(captor.capture());
         assertEquals(ACCOUNT_NUMBER, accountDto.getAccountNumber());
         assertEquals(111L, accountDto.getMemberId());
+        assertEquals(AccountStatus.IN_USE, captor.getValue().getAccountStatus());
+
+        // 랜덤 계좌 생성 방식으로 변경 시 삭제할 코드
         assertEquals(
                 Integer.toString(Integer.parseInt(ACCOUNT_NUMBER) + 1),
                 captor.getValue().getAccountNumber()
         );
-        assertEquals(AccountStatus.IN_USE, captor.getValue().getAccountStatus());
     }
 
     @Test

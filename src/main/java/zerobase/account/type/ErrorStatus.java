@@ -8,7 +8,12 @@ import lombok.Getter;
 public enum ErrorStatus {
     INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
     USER_NOT_FOUND("해당 유저가 존재하지 않습니다."),
-    TOO_MANY_ACCOUNT_PER_MEMBER("개설한 계좌가 최대치(10개) 입니다.");
+    TOO_MANY_ACCOUNT_PER_MEMBER("개설한 계좌가 최대치(10개) 입니다."),
+    ACCOUNT_NOT_FOUND("해당 계좌가 존재하지 않습니다."),
+    ACCOUNT_MEMBER_UN_MATCH("사용자가 계좌의 소유주가 아닙니다."),
+    ACCOUNT_ALREADY_CANCELED("계좌가 이미 해지되었습니다."),
+    BALANCE_NOT_EMPTY("해지할 계좌에 잔고가 존재합니다."),
+    ;
 
     private final String description;
 }
