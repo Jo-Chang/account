@@ -82,10 +82,9 @@ public class AccountService {
         account.setAccountStatus(AccountStatus.IN_CANCEL);
         account.setUnRegisteredAt(LocalDateTime.now());
 
-        // 테스트 코드용 save()
-        accountRepository.save(account);
+        Account saved = accountRepository.save(account);
 
-        return AccountDto.fromEntity(account);
+        return AccountDto.fromEntity(saved);
     }
 
     private void invalidateCancelAccount(Member member, Account account) {

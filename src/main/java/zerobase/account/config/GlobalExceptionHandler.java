@@ -16,14 +16,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccountException.class)
     public ErrorResponse handleAccountException(AccountException e) {
-        log.error("{} - AccountException is occurred.", e, e.getErrorStatus());
+        log.error("{} - {} error is occurred.", e, e.getErrorStatus());
 
         return new ErrorResponse(e.getErrorStatus());
     }
 
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception e) {
-        log.error("error occurred", e);
+        log.error("{} - error occurred", e);
 
         return new ErrorResponse(ErrorStatus.INTERNAL_SERVER_ERROR);
     }

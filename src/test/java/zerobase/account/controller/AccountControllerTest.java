@@ -9,13 +9,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import zerobase.account.dto.AccountDto;
+import zerobase.account.dto.CancelAccount;
 import zerobase.account.dto.CreateAccount;
 import zerobase.account.service.AccountService;
 
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AccountController.class)
 class AccountControllerTest {
+    private final Long MEMBER_ID = 111L;
     private final String ACCOUNT_NUMBER = "1000000002";
 
     @MockitoBean
@@ -35,7 +39,7 @@ class AccountControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("[계좌 생성 컨트롤러] 성공")
+    @DisplayName("[계좌 생성] 성공")
     void successCreateAccount() throws Exception {
         // given
         given(accountService.createAccount(anyLong(), anyLong()))
@@ -43,7 +47,7 @@ class AccountControllerTest {
                         .memberId(1L)
                         .accountNumber(ACCOUNT_NUMBER)
                         .registeredAt(LocalDateTime.now())
-                        .unRegisteredAt(LocalDateTime.now())
+                        .unRegisteredAt(null)
                         .build());
 
         // when
@@ -55,6 +59,31 @@ class AccountControllerTest {
                         )))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.memberId").value(1L))
+                .andExpect(jsonPath("$.accountNumber").value(ACCOUNT_NUMBER))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[계좌 해지] 성공")
+    void successCancelAccount() throws Exception {
+        // given
+        given(accountService.cancelAccount(anyLong(), anyString()))
+                .willReturn(AccountDto.builder()
+                        .memberId(MEMBER_ID)
+                        .accountNumber(ACCOUNT_NUMBER)
+                        .registeredAt(LocalDateTime.now())
+                        .unRegisteredAt(LocalDateTime.now())
+                        .build());
+
+        // when
+        // then
+        mockMvc.perform(delete("/account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CancelAccount.Request(3L, ACCOUNT_NUMBER)
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.memberId").value(MEMBER_ID))
                 .andExpect(jsonPath("$.accountNumber").value(ACCOUNT_NUMBER))
                 .andDo(print());
     }
