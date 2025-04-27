@@ -9,17 +9,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import zerobase.account.dto.AccountDto;
+import zerobase.account.dto.AccountInfo;
 import zerobase.account.dto.CancelAccount;
 import zerobase.account.dto.CreateAccount;
 import zerobase.account.service.AccountService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -86,6 +87,32 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.memberId").value(MEMBER_ID))
                 .andExpect(jsonPath("$.accountNumber").value(ACCOUNT_NUMBER))
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[계좌 확인] 성공")
+    void successGetlAccount() throws Exception {
+        // given
+        AccountInfo info = AccountInfo.builder()
+                .accountNumber(ACCOUNT_NUMBER)
+                .balance(1L)
+                .build();
+        AccountInfo info2 = AccountInfo.builder()
+                .accountNumber("accountNum")
+                .balance(22222L)
+                .build();
+        given(accountService.getAccount(anyLong()))
+                .willReturn(List.of(info, info2));
+
+        // when
+        // then
+        mockMvc.perform(get("/account?member_id=1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].accountNumber").value(ACCOUNT_NUMBER))
+                .andExpect(jsonPath("$[0].balance").value(1L))
+                .andExpect(jsonPath("$[1].accountNumber").value(info2.getAccountNumber()))
+                .andExpect(jsonPath("$[1].balance").value(info2.getBalance()));
     }
 
 }

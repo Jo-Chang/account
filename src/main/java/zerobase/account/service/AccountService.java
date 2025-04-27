@@ -1,24 +1,20 @@
 package zerobase.account.service;
 
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zerobase.account.domain.Account;
 import zerobase.account.domain.Member;
 import zerobase.account.dto.AccountDto;
+import zerobase.account.dto.AccountInfo;
 import zerobase.account.exception.AccountException;
 import zerobase.account.repository.AccountRepository;
 import zerobase.account.repository.MemberRepository;
 import zerobase.account.type.AccountStatus;
-import zerobase.account.type.ErrorStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static zerobase.account.type.ErrorStatus.*;
 
@@ -101,4 +97,12 @@ public class AccountService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<AccountInfo> getAccount(Long memberId) {
+        Member member = getMember(memberId);
+
+        return accountRepository.findAllByMember(member).stream()
+                .map(AccountInfo::fromEntity)
+                .toList();
+    }
 }

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import zerobase.account.domain.Account;
 import zerobase.account.domain.Member;
 import zerobase.account.dto.AccountDto;
+import zerobase.account.dto.AccountInfo;
 import zerobase.account.exception.AccountException;
 import zerobase.account.repository.AccountRepository;
 import zerobase.account.repository.MemberRepository;
@@ -17,6 +18,7 @@ import zerobase.account.type.AccountStatus;
 import zerobase.account.type.ErrorStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -315,6 +317,70 @@ class AccountServiceTest {
 
         // then
         assertEquals(ErrorStatus.BALANCE_NOT_EMPTY, exception.getErrorStatus());
+    }
+
+    @Test
+    @DisplayName("[계좌 확인] 성공")
+    void getAccount_Success() {
+        // given
+        Member testUser = Member.builder()
+                .id(MEMBER_ID)
+                .username("test-user")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Account account1 = Account.builder()
+                .accountNumber("accountNumber1")
+                .member(testUser)
+                .balance(1L)
+                .accountStatus(AccountStatus.IN_USE)
+                .build();
+        Account account2 = Account.builder()
+                .accountNumber("accountNumber2")
+                .member(testUser)
+                .balance(1L)
+                .accountStatus(AccountStatus.IN_USE)
+                .build();
+        Account account3 = Account.builder()
+                .accountNumber("accountNumber3")
+                .member(testUser)
+                .balance(1L)
+                .accountStatus(AccountStatus.IN_USE)
+                .build();
+
+        given(memberRepository.findById(anyLong()))
+                .willReturn(Optional.of(testUser));
+        given(accountRepository.findAllByMember(any()))
+                .willReturn(List.of(
+                        account1,
+                        account2,
+                        account3
+                ));
+
+        // when
+        List<AccountInfo> accountInfoList = accountService.getAccount(1L);
+
+        // then
+        assertEquals(3, accountInfoList.size());
+        assertEquals("accountNumber1", accountInfoList.get(0).getAccountNumber());
+        assertEquals(1L, accountInfoList.get(0).getBalance());
+    }
+
+    @Test
+    @DisplayName("[계좌 확인] 실패 - 유저가 존재하지 않습니다.")
+    void getAccount_UserNotFound() {
+        // given
+        given(memberRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        // when
+        AccountException exception = assertThrows(
+                AccountException.class,
+                () -> accountService.cancelAccount(1L, "")
+        );
+
+        // then
+        assertEquals(ErrorStatus.USER_NOT_FOUND, exception.getErrorStatus());
     }
 
 }

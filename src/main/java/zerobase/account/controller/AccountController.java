@@ -2,13 +2,11 @@ package zerobase.account.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import zerobase.account.dto.CancelAccount;
-import zerobase.account.dto.CreateAccount;
+import org.springframework.web.bind.annotation.*;
+import zerobase.account.dto.*;
 import zerobase.account.service.AccountService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +34,13 @@ public class AccountController {
                         request.getAccountNumber()
                 )
         );
+    }
+
+    @GetMapping("/account")
+    public List<AccountInfo> getAccountsByMemberId(
+            @RequestParam("member_id") Long memberId
+    ) {
+        return accountService.getAccount(memberId);
     }
 
 }
