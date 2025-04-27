@@ -10,7 +10,6 @@ import zerobase.account.exception.AccountException;
 import zerobase.account.repository.AccountRepository;
 import zerobase.account.repository.MemberRepository;
 import zerobase.account.type.AccountStatus;
-import zerobase.account.type.ErrorStatus;
 
 import java.time.LocalDateTime;
 
