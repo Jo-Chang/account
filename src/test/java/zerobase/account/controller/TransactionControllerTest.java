@@ -8,10 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import zerobase.account.dto.AccountDto;
-import zerobase.account.dto.CreateAccount;
-import zerobase.account.dto.TransactionDto;
-import zerobase.account.dto.UseBalance;
+import zerobase.account.dto.*;
 import zerobase.account.service.AccountService;
 import zerobase.account.service.TransactionService;
 import zerobase.account.type.TransactionResultType;
@@ -43,7 +40,7 @@ class TransactionControllerTest {
 
     @Test
     @DisplayName("[거래] 성공")
-    void successCreateAccount() throws Exception {
+    void successUseBalance() throws Exception {
         // given
         Long amount = 100L;
 
@@ -70,4 +67,35 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.amount").value(amount))
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("[거래 취소] 성공")
+    void successCancelBalance() throws Exception {
+        // given
+        Long amount = 100L;
+
+        given(transactionService.cancelBalance(anyString(), anyString(), anyLong()))
+                .willReturn(TransactionDto.builder()
+                        .transactionId(TRANSACTION_ID)
+                        .transactionResultType(TransactionResultType.SUCCESS)
+                        .transactedAt(LocalDateTime.now())
+                        .amount(amount)
+                        .accountNumber(ACCOUNT_NUMBER)
+                        .build());
+
+        // when
+        // then
+        mockMvc.perform(post("/transaction/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CancelBalance.Request("1", ACCOUNT_NUMBER, 100L)
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId").value(TRANSACTION_ID))
+                .andExpect(jsonPath("$.accountNumber").value(ACCOUNT_NUMBER))
+                .andExpect(jsonPath("$.transactionResult").value("SUCCESS"))
+                .andExpect(jsonPath("$.amount").value(amount))
+                .andDo(print());
+    }
+    
 }

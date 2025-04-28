@@ -14,6 +14,9 @@ public enum ErrorStatus {
     ACCOUNT_ALREADY_CANCELED("계좌가 이미 해지되었습니다."),
     BALANCE_NOT_EMPTY("해지할 계좌에 잔고가 존재합니다."),
     BALANCE_NOT_ENOUGH("계좌 잔고가 부족합니다."),
+    TRANSACTION_NOT_FOUND("해당 거래가 존재하지 않습니다."),
+    TRANSACTION_AMOUNT_UN_MATCH("취소 금액이 거래 금액과 다릅니다."),
+    TRANSACTION_ACCOUNT_UN_MATCH("거래 계좌가 일치하지 않습니다."),
     ;
 
     private final String description;

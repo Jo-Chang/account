@@ -3,6 +3,7 @@ package zerobase.account.dto;
 import lombok.*;
 import zerobase.account.domain.Transaction;
 import zerobase.account.type.TransactionResultType;
+import zerobase.account.type.TransactionType;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class TransactionDto {
     private String accountNumber;
     private Long amount;
     private TransactionResultType transactionResultType;
+    private TransactionType transactionType;
     private LocalDateTime transactedAt;
 
     public static TransactionDto fromEntity(Transaction transaction) {
@@ -24,6 +26,7 @@ public class TransactionDto {
                 .accountNumber(transaction.getAccount().getAccountNumber())
                 .amount(transaction.getAmount())
                 .transactionResultType(transaction.getTransactionResultType())
+                .transactionType(transaction.getTransactionType())
                 .transactedAt(transaction.getTransactedAt())
                 .build();
     }

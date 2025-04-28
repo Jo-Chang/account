@@ -6,17 +6,15 @@ import zerobase.account.type.TransactionResultType;
 
 import java.time.LocalDateTime;
 
-public class UseBalance {
-
+public class CancelBalance {
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     public static class Request {
-        @NotNull
-        @Min(1)
-        private Long memberId;
+        @NotBlank
+        private String transactionId;
 
         @NotBlank
         @Size(min = 10, max = 10)
@@ -40,8 +38,8 @@ public class UseBalance {
         private Long amount;
         private LocalDateTime transactedAt;
 
-        public static Response from(TransactionDto transactionDto) {
-            return Response.builder()
+        public static CancelBalance.Response from(TransactionDto transactionDto) {
+            return CancelBalance.Response.builder()
                     .transactionId(transactionDto.getTransactionId())
                     .accountNumber(transactionDto.getAccountNumber())
                     .transactionResult(transactionDto.getTransactionResultType())
@@ -50,5 +48,4 @@ public class UseBalance {
                     .build();
         }
     }
-
 }

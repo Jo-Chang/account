@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import zerobase.account.domain.Account;
 import zerobase.account.domain.Member;
 import zerobase.account.domain.Transaction;
+import zerobase.account.dto.CancelBalance;
 import zerobase.account.dto.TransactionDto;
 import zerobase.account.exception.AccountException;
 import zerobase.account.repository.AccountRepository;
@@ -18,11 +19,13 @@ import zerobase.account.type.TransactionType;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static zerobase.account.type.ErrorStatus.*;
 import static zerobase.account.type.TransactionResultType.FAIL;
 import static zerobase.account.type.TransactionResultType.SUCCESS;
+import static zerobase.account.type.TransactionType.CANCEL;
 import static zerobase.account.type.TransactionType.USE;
 
 @Service
@@ -45,7 +48,7 @@ public class TransactionService {
 
         return TransactionDto.fromEntity(executeTransaction(
                 SUCCESS, USE, account, amount
-                ));
+        ));
     }
 
     private Account getAccountByAccountNumber(String accountNumber) {
@@ -100,4 +103,35 @@ public class TransactionService {
         executeTransaction(FAIL, USE, account, amount);
     }
 
+    @Transactional
+    public TransactionDto cancelBalance(String transactionId, String accountNumber, Long amount) {
+        Account account = getAccountByAccountNumber(accountNumber);
+
+        Transaction transaction = transactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() -> new AccountException(TRANSACTION_NOT_FOUND));
+
+        invalidCancelBalance(transaction, account, amount);
+
+        account.cancelBalance(amount);
+
+        return TransactionDto.fromEntity(executeTransaction(
+                SUCCESS, CANCEL, account, amount
+        ));
+    }
+
+    private void invalidCancelBalance(Transaction transaction, Account account, Long amount) {
+        if (!Objects.equals(transaction.getAmount(), amount)) {
+            throw new AccountException(TRANSACTION_AMOUNT_UN_MATCH);
+        }
+
+        if (!transaction.getAccount().getAccountNumber().equals(account.getAccountNumber())) {
+            throw new AccountException(TRANSACTION_ACCOUNT_UN_MATCH);
+        }
+    }
+
+    public void failedCancelTransaction(String accountNumber, Long amount) {
+        Account account = getAccountByAccountNumber(accountNumber);
+
+        executeTransaction(FAIL, CANCEL, account, amount);
+    }
 }
