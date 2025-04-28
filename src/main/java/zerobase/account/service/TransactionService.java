@@ -107,8 +107,7 @@ public class TransactionService {
     public TransactionDto cancelBalance(String transactionId, String accountNumber, Long amount) {
         Account account = getAccountByAccountNumber(accountNumber);
 
-        Transaction transaction = transactionRepository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new AccountException(TRANSACTION_NOT_FOUND));
+        Transaction transaction = getTransactionById(transactionId);
 
         invalidCancelBalance(transaction, account, amount);
 
@@ -117,6 +116,11 @@ public class TransactionService {
         return TransactionDto.fromEntity(executeTransaction(
                 SUCCESS, CANCEL, account, amount
         ));
+    }
+
+    private Transaction getTransactionById(String transactionId) {
+        return transactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() -> new AccountException(TRANSACTION_NOT_FOUND));
     }
 
     private void invalidCancelBalance(Transaction transaction, Account account, Long amount) {
@@ -133,5 +137,12 @@ public class TransactionService {
         Account account = getAccountByAccountNumber(accountNumber);
 
         executeTransaction(FAIL, CANCEL, account, amount);
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionDto queryTransaction(String transactionId) {
+        return TransactionDto.fromEntity(
+                getTransactionById(transactionId)
+        );
     }
 }

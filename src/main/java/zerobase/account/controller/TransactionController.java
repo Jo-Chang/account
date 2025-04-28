@@ -2,10 +2,10 @@ package zerobase.account.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import zerobase.account.dto.CancelBalance;
+import zerobase.account.dto.TransactionDto;
+import zerobase.account.dto.TransactionInfo;
 import zerobase.account.dto.UseBalance;
 import zerobase.account.exception.AccountException;
 import zerobase.account.service.TransactionService;
@@ -70,5 +70,20 @@ public class TransactionController {
 
             throw e;
         }
+    }
+
+    /**
+     * @Param transaction_id
+     * @Return 계좌번호, 거래종류(잔액 사용, 잔액 사용 취소), transaction_result,
+     * transaction_id, 거래금액, 거래일시
+     * @Exception 해당 transaction_id 없는 경우 실패 응답
+     */
+    @GetMapping("/transaction/{id}")
+    public TransactionDto queryTransaction(
+            @PathVariable String id
+    ) {
+        return TransactionInfo.from(
+                transactionService.queryTransaction(id)
+        );
     }
 }

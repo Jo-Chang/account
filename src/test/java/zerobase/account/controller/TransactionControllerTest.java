@@ -12,6 +12,7 @@ import zerobase.account.dto.*;
 import zerobase.account.service.AccountService;
 import zerobase.account.service.TransactionService;
 import zerobase.account.type.TransactionResultType;
+import zerobase.account.type.TransactionType;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,6 +96,34 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.transactionId").value(TRANSACTION_ID))
                 .andExpect(jsonPath("$.accountNumber").value(ACCOUNT_NUMBER))
                 .andExpect(jsonPath("$.transactionResult").value("SUCCESS"))
+                .andExpect(jsonPath("$.amount").value(amount))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[거래 확인] 성공")
+    void successQueryTransaction() throws Exception {
+        // given
+        Long amount = 100L;
+
+        given(transactionService.queryTransaction(anyString()))
+                .willReturn(TransactionDto.builder()
+                        .transactionId(TRANSACTION_ID)
+                        .transactionResultType(TransactionResultType.SUCCESS)
+                        .transactionType(TransactionType.USE)
+                        .transactedAt(LocalDateTime.now())
+                        .amount(amount)
+                        .accountNumber(ACCOUNT_NUMBER)
+                        .build());
+
+        // when
+        // then
+        mockMvc.perform(get("/transaction/id"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId").value(TRANSACTION_ID))
+                .andExpect(jsonPath("$.accountNumber").value(ACCOUNT_NUMBER))
+                .andExpect(jsonPath("$.transactionResultType").value("SUCCESS"))
+                .andExpect(jsonPath("$.transactionType").value("USE"))
                 .andExpect(jsonPath("$.amount").value(amount))
                 .andDo(print());
     }
