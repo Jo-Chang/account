@@ -13,6 +13,7 @@ public enum ErrorStatus {
     ACCOUNT_MEMBER_UN_MATCH("사용자가 계좌의 소유주가 아닙니다."),
     ACCOUNT_ALREADY_CANCELED("계좌가 이미 해지되었습니다."),
     BALANCE_NOT_EMPTY("해지할 계좌에 잔고가 존재합니다."),
+    BALANCE_NOT_ENOUGH("계좌 잔고가 부족합니다."),
     ;
 
     private final String description;

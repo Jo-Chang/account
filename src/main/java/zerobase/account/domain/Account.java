@@ -27,4 +27,12 @@ public class Account extends BaseEntity {
 
     private LocalDateTime registeredAt;
     private LocalDateTime unRegisteredAt;
+
+    public void useBalance(Long amount) {
+        this.balance -= amount;
+    }
+
+    public void cancelBalance(Long amount) {
+        this.balance += amount;
+    }
 }
