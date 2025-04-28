@@ -2,7 +2,9 @@ package zerobase.account.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import zerobase.account.aop.AccountLock;
 import zerobase.account.dto.CancelBalance;
 import zerobase.account.dto.TransactionDto;
 import zerobase.account.dto.TransactionInfo;
@@ -10,6 +12,7 @@ import zerobase.account.dto.UseBalance;
 import zerobase.account.exception.AccountException;
 import zerobase.account.service.TransactionService;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class TransactionController {
@@ -25,9 +28,10 @@ public class TransactionController {
      * 거래금액이 너무 작거나 큰 경우 실패 응답
      */
     @PostMapping("/transaction/use")
+    @AccountLock
     public UseBalance.Response useBalance(
             @RequestBody @Valid UseBalance.Request request
-    ) {
+    ) throws InterruptedException {
         try {
             return UseBalance.Response.from(
                     transactionService.useBalance(
@@ -37,6 +41,8 @@ public class TransactionController {
                     )
             );
         } catch (AccountException e) {
+            log.error("Failed to use balance.");
+
             transactionService.failedUseTransaction(
                     request.getAccountNumber(),
                     request.getAmount()
@@ -53,6 +59,7 @@ public class TransactionController {
      * 트랜잭션이 해당 계좌의 거래가 아닌경우 실패 응답
      */
     @PostMapping("/transaction/cancel")
+    @AccountLock
     public CancelBalance.Response cancelBalance(
             @RequestBody @Valid CancelBalance.Request request
     ) {
@@ -63,6 +70,8 @@ public class TransactionController {
                     request.getAmount()
             ));
         } catch (AccountException e) {
+            log.error("Failed to use balance.");
+
             transactionService.failedCancelTransaction(
                     request.getAccountNumber(),
                     request.getAmount()

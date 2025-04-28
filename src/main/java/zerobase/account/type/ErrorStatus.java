@@ -17,6 +17,7 @@ public enum ErrorStatus {
     TRANSACTION_NOT_FOUND("해당 거래가 존재하지 않습니다."),
     TRANSACTION_AMOUNT_UN_MATCH("취소 금액이 거래 금액과 다릅니다."),
     TRANSACTION_ACCOUNT_UN_MATCH("거래 계좌가 일치하지 않습니다."),
+    ACCOUNT_TRANSACTION_LOCK("해당 계좌가 거래중입니다."),
     ;
 
     private final String description;
